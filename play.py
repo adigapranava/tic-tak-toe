@@ -1,6 +1,7 @@
 import turtle
 import numpy
 import math
+import time
 
 color={'bg':"#99A3A4",  "end_game_b":"#990033", "end_game_f":"#9999CC", "opening_b":"#FFFF00",    "opening_f":"#000000",  "start_b":"#FDFEFE",    "strat_f":"#17202A"}
 
@@ -8,6 +9,7 @@ screen = turtle.Screen()
 screen.bgcolor(color["bg"])
 screen.setup(580,580) 
 t2 = turtle.Turtle()
+t2.color("#00E886")
 t2.speed(0)
 t2.hideturtle()
 
@@ -23,6 +25,78 @@ p2s = "O"
 turn = 0
 row = 4
 col = 4
+
+
+def won(symbol):
+    return check_rows(symbol) or check_columns(symbol) or check_diagnols(symbol)
+
+def check_rows(symbol):
+    for r in range(3):
+        count=0
+        for c in range(3):
+            if board[r][c] == symbol:
+                count += 1
+                if count == 3:
+                    break
+        if count == 3:
+            t2.penup()
+            t2.color("red")
+            t2.pensize(12)
+            t2.goto(POSX + 20, POSY - r * SIDE / SIZE - SIDE /(2* SIZE))
+            t2.setheading(0)
+            t2.pendown()
+            t2.forward(SIDE - 40)
+            t2.penup()
+            return True
+    return False
+
+def check_columns(symbol):
+    for c in range(3):
+        count = 0
+        for r in range(3):
+            if board[r][c] == symbol:
+                count += 1
+                if count == 3:
+                    break
+        if count == 3:
+            t2.penup()
+            t2.color("red")
+            t2.pensize(12)
+            t2.goto(POSX  + c * SIDE / SIZE + SIDE /(2* SIZE), POSY - 20)
+            t2.setheading(-90)
+            t2.pendown()
+            t2.forward(SIDE - 40)
+            t2.penup()
+            return True
+    return False
+
+def check_diagnols(symbol):
+    global t2
+    count = 0
+    for i in range(3):
+        if board[i][i] == symbol:
+            count += 1
+        if count == 3:
+            t2.penup()
+            t2.color("#FF00D1")
+            t2.pensize(12)
+            t2.goto(POSX + 20, POSY- 20)
+            t2.setheading(-45)
+            t2.pendown()
+            t2.forward(SIDE * math.sqrt(2) - 60)
+            t2.penup()
+            return True
+    if board[0][2] == board[1][1] == board[2][0] == symbol:
+        t2.penup()
+        t2.color("red")
+        t2.pensize(12)
+        t2.goto(POSX + 3 * SIDE / SIZE - 20, POSY - 20)
+        t2.setheading(225)
+        t2.pendown()
+        t2.forward(SIDE * math.sqrt(2) - 60)
+        t2.penup()
+        return True
+    else: return False
 
 def layout():
     global POSX, POSY, SIDE
@@ -72,6 +146,7 @@ def layout():
 def cross(i, j):
     global t2
     t2.penup()
+    t2.color("#00FFEC")
     t2.goto(POSX + j * SIDE / SIZE + 20, POSY - i * SIDE / SIZE - 20)
     t2.setheading(-45)
     t2.pendown()
@@ -86,6 +161,7 @@ def cross(i, j):
 def circle(i, j):
     global t2
     t2.penup()
+    t2.color("#F0FF00")
     t2.goto(POSX + j * SIDE / SIZE + SIDE / SIZE - 40, POSY - i * SIDE / SIZE - SIDE / SIZE + 40)
     t2.pendown()
     t2.circle(SIDE / (2 * SIZE) - 20)
@@ -112,12 +188,24 @@ def clicked(x, y):
     if row >= 0 and row < 3 and col >= 0 and col < 3 and board[row][col] == '-' and turn < 10:
             if turn%2 == 0:
                 place(p1s, row, col)
+                if won(p1s):
+                    print(p1s,"won")
+                    time.sleep(2)
+                    quit()
                 turn += 1
             else:
                 place(p2s, row, col)              
-                turn += 1 
+                if won(p2s):
+                    print(p2s,"won")
+                    time.sleep(2)
+                    quit()
+                turn += 1
+    elif turn == 9:
+        if not(won(p1s)) and not(won(p2s)):
+            print("Draw")
+            quit()
     else:
-        print("Error")
+        print("Error") 
         
 def play():
     layout()
@@ -128,3 +216,11 @@ def play():
     turtle.mainloop()
 
 play()
+
+
+
+
+
+
+
+
